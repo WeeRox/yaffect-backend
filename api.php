@@ -50,7 +50,7 @@ switch (array_shift($request)) {
     break;
 
   default:
-    # code...
+    // TODO
     break;
 }
 
