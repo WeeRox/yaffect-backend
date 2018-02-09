@@ -5,6 +5,7 @@ ini_set('display_errors', 'On');
 use Controller\UsersController;
 use Controller\OrganizationsController;
 use Response;
+use Response\ErrorResponse;
 
 // Register an autoloader for classes.
 // The namespace will correspond to folder structure
@@ -18,8 +19,6 @@ spl_autoload_register(function ($class)
 
 // Turn the request path into an array
 $request = explode("/", $_GET['request']);
-
-print_r($request);
 
 $request_body = json_decode(file_get_contents("php://input"));
 
@@ -35,7 +34,8 @@ switch (array_shift($request)) {
     break;
 
   default:
-    // TODO
+    ErrorResponse::invalidResource();
+    exit;
     break;
 }
 
