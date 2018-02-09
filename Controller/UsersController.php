@@ -15,6 +15,11 @@ class UsersController extends Controller
     parent::__construct($request, $request_body);
   }
 
+  function get_methods()
+  {
+    return array("GET", "POST", "DELETE");
+  }
+
   function get()
   {
     $id = $this->checkForId();

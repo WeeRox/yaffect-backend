@@ -31,26 +31,22 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch (array_shift($request)) {
   case 'users':
-    $usersController = new UsersController($db, $request, $request_body);
-    if (method_exists($usersController, $method)) {
-      $usersController->$method();
-    } else {
-      ErrorResponse::invalidMethod(array("GET", "POST"));
-    }
+    $controller = new UsersController($db, $request, $request_body);
     break;
 
   case 'organizations':
-    $organizationsController = new OrganizationsController($db, $request, $request_body);
-    if (method_exists($organizationsController, $method)) {
-      $organizationsController->$method();
-    } else {
-      ErrorResponse::invalidMethod(array("GET, POST, DELETE"));
-    }
+    $controller = new OrganizationsController($db, $request, $request_body);
     break;
 
   default:
     // TODO
     break;
+}
+
+if (method_exists($controller, $method)) {
+  $controller->$method();
+} else {
+  ErrorResponse::invalidMethod($controller->get_methods());
 }
 
 $db->close();
