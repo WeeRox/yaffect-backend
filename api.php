@@ -4,7 +4,6 @@ ini_set('display_errors', 'On');
 
 use Controller\UsersController;
 use Controller\OrganizationsController;
-use Response;
 use Response\ErrorResponse;
 
 // Register an autoloader for classes.
