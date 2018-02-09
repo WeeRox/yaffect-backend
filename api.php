@@ -35,9 +35,8 @@ switch (array_shift($request)) {
     if (method_exists($usersController, $method)) {
       $usersController->$method();
     } else {
-      Response::response405(array("GET", "POST"));
+      ErrorResponse::invalidMethod(array("GET", "POST"));
     }
-
     break;
 
   case 'organizations':
@@ -45,7 +44,7 @@ switch (array_shift($request)) {
     if (method_exists($organizationsController, $method)) {
       $organizationsController->$method();
     } else {
-      Response::response405(array("GET, POST, DELETE"));
+      ErrorResponse::invalidMethod(array("GET, POST, DELETE"));
     }
     break;
 

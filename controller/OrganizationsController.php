@@ -20,7 +20,7 @@ class OrganizationsController extends Controller
     if ($id != null) {
       $json = $this->organization->getOrganizationById($id);
       if ($json === null) {
-        Response::response404();
+        ErrorResponse::invalidResource();
         return;
       }
 
@@ -43,8 +43,7 @@ class OrganizationsController extends Controller
     $name = $this->getJsonValue("name");
 
     if ($name === null) {
-      $json = json_encode(array('error' => "Missing required parameter name"));
-      Response::response400($json);
+      ErrorResponse::invalidRequest();
     } else {
       if (!($id = $this->organization->createOrganization($name))) {
         Response::response500();
@@ -72,7 +71,7 @@ class OrganizationsController extends Controller
         return;
       }
     } else {
-      Response::response405(array("GET"));
+      ErrorResponse::invalidMethod(array("GET"));
     }
   }
 }

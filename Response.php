@@ -26,32 +26,6 @@ class Response
     http_response_code(204);
   }
 
-  static function response400($message) {
-    http_response_code(400);
-    header("Content-Type: application/json");
-    echo $message;
-  }
-
-  static function response404()
-  {
-    http_response_code(404);
-  }
-
-  static function response405($methods)
-  {
-    $allow = "Allow: ";
-
-    for ($i = 0; $i < count($methods); $i++) {
-      if ($i != 0) {
-        $allow .= ", ";
-      }
-      $allow .= $methods[$i];
-    }
-
-    http_response_code(405);
-    header($allow);
-  }
-
   static function response500()
   {
     http_response_code(500);

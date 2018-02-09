@@ -21,7 +21,7 @@ class UsersController extends Controller
     if ($id != null) {
       $json = $this->user->getUserById($id);
       if ($json === null) {
-        Response::response404();
+        ErrorResponse::invalidResource();
         return;
       }
 
@@ -52,17 +52,13 @@ class UsersController extends Controller
     //TODO: Check that we don't create another user that already exist
 
     if ($name === null) {
-      $json = json_encode(array('error' => "Missing required parameter name"));
-      Response::response400($json);
+      ErrorResponse::invalidRequest();
     } else if ($email === null) {
-      $json = json_encode(array('error' => "Missing required parameter email"));
-      Response::response400($json);
+      ErrorResponse::invalidRequest();
     } else if ($password === null) {
-      $json = json_encode(array('error' => "Missing required parameter password"));
-      Response::response400($json);
+      ErrorResponse::invalidRequest();
     } else if ($birthdate === null) {
-      $json = json_encode(array('error' => "Missing required parameter birthdate"));
-      Response::response400($json);
+      ErrorResponse::invalidRequest();
     } else {
       if (!($id = $this->user->createUser($name, $email, $password, $birthdate))) {
         Response::response500();
@@ -87,11 +83,11 @@ class UsersController extends Controller
         Response::response204();
         return;
       } else {
-        Reponse::response500();
+        Response::response500();
         return;
       }
     } else {
-      Response::response405(array("GET"));
+      ErrorResponse::invalidMethod(array("GET"));
     }
   }
 }
