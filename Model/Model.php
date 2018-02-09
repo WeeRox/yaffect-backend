@@ -42,7 +42,7 @@ class Model
       // 48 bits for "node"
       mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
     );
-    return $this->uuid2hex($uuid);
+    return $uuid;
   }
 
   function uuid2hex($uuid) {
@@ -56,6 +56,27 @@ class Model
     $uuid = substr_replace($uuid, '-', 12, 0);
     $uuid = substr_replace($uuid, '-', 8, 0);
     return $uuid;
+  }
+
+  function hex2base64url($uuid) {
+    if (strpos($uuid, '-') !== false) {
+      // The string contains '-', remove them
+      $uuid = uuid2hex($uuid);
+    }
+
+    return $this->base64url_encode(pack('H*', $uuid));
+  }
+
+  function base64url2hex($uuid) {
+    return bin2hex($this->base64url_decode($uuid));
+  }
+
+  private function base64url_encode($data) {
+    return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+  }
+
+  private function base64url_decode($data) {
+    return base64_decode(strtr($data, '-_', '+/'));
   }
 }
 ?>
