@@ -9,22 +9,14 @@ class Model
 
   function __construct()
   {
-    exit();
     if (!isset(self::$db)) {
       $config = include __DIR__ . "/../config.php";
 
       self::$db = new mysqli($config['hostname'], $config['username'], $config['password'], $config['database']);
-    }
 
-    if (self::$db === false) {
-      // TODO: handle internal error
-    }
-  }
-
-  function __destruct()
-  {
-    if (self::$db !== null) {
-      self::$db->close();
+      if (self::$db->connect_error) {
+        // TODO: handle internal error
+      }
     }
   }
 
