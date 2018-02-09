@@ -3,6 +3,7 @@ namespace Controller;
 
 use Model\User;
 use Response;
+use Response\ErrorResponse;
 
 class UsersController extends Controller
 {
@@ -22,9 +23,9 @@ class UsersController extends Controller
 
   function get()
   {
-    $id = $this->checkForId();
-    if ($id != null) {
-      $json = $this->user->getUserById($id);
+    if ($this->hasId()) {
+      $json = $this->user->getUserById($this->getId());
+
       if ($json === null) {
         ErrorResponse::invalidResource();
         return;
@@ -81,17 +82,14 @@ class UsersController extends Controller
 
   function delete()
   {
-    $id = $this->checkForId();
-    if ($id != null) {
-      $response = $this->user->deleteOrganization($id);
-      if ($response) {
+    if ($this->hasId()) {
+      if ($this->user->deleteUser($this->getId())) {
         Response::response204();
-        return;
       } else {
-        Response::response500();
-        return;
+        // TODO: internal error
       }
     } else {
+      // if no id was sent a delete operation cannot be performed
       ErrorResponse::invalidMethod(array("GET"));
     }
   }

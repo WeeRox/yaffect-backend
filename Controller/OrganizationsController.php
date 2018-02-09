@@ -21,9 +21,9 @@ class OrganizationsController extends Controller
 
   function get()
   {
-    $id = $this->checkForId();
-    if ($id != null) {
-      $json = $this->organization->getOrganizationById($id);
+    if ($this->hasId()) {
+      $json = $this->organization->getOrganizationById($this->getId());
+
       if ($json === null) {
         ErrorResponse::invalidResource();
         return;
@@ -65,17 +65,14 @@ class OrganizationsController extends Controller
 
   function delete()
   {
-    $id = $this->checkForId();
-    if ($id != null) {
-      $response = $this->organization->deleteOrganization($id);
-      if ($response) {
+    if ($this->hasId()) {
+      if ($this->organization->deleteOrganization($this->getId())) {
         Response::response204();
-        return;
       } else {
-        Reponse::response500();
-        return;
+        // TODO: internal error
       }
     } else {
+      // if no id was sent a delete operation cannot be performed
       ErrorResponse::invalidMethod(array("GET"));
     }
   }

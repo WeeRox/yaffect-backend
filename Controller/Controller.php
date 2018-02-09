@@ -12,16 +12,18 @@ class Controller
     $this->request_body = $request_body;
   }
 
-  function checkForId() {
+  function hasId()
+  {
     if (count($this->request) >= 1) {
-      if (preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i', $this->request[0])) {
-        return $this->request[0];
-      } else {
-        return null;
+      if (preg_match('/^[A-Za-z0-9_-]+$/', $this->request[0])) {
+        return true;
       }
-    } else {
-      return null;
     }
+    return false;
+  }
+
+  function getId() {
+    return $this->request[0];
   }
 
   function getJsonValue($name)
