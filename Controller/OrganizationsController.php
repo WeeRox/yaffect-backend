@@ -8,9 +8,9 @@ class OrganizationsController extends Controller
 {
   private $organization;
 
-  function __construct($db, $request, $request_body)
+  function __construct($request, $request_body)
   {
-    $this->organization = new Organization($db);
+    $this->organization = new Organization();
     parent::__construct($request, $request_body);
   }
 

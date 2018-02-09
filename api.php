@@ -16,14 +16,10 @@ spl_autoload_register(function ($class)
   }
 });
 
-// Include config for MySQL server.
-$config = include 'config.php';
-
-// Create an connection to the MySQL server
-$db = new mysqli($config['hostname'], $config['username'], $config['password'], $config['database']);
-
 // Turn the request path into an array
 $request = explode("/", $_GET['request']);
+
+print_r($request);
 
 $request_body = json_decode(file_get_contents("php://input"));
 
@@ -31,11 +27,11 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch (array_shift($request)) {
   case 'users':
-    $controller = new UsersController($db, $request, $request_body);
+    $controller = new UsersController($request, $request_body);
     break;
 
   case 'organizations':
-    $controller = new OrganizationsController($db, $request, $request_body);
+    $controller = new OrganizationsController($request, $request_body);
     break;
 
   default:
@@ -48,6 +44,4 @@ if (method_exists($controller, $method)) {
 } else {
   ErrorResponse::invalidMethod($controller->get_methods());
 }
-
-$db->close();
 ?>

@@ -1,13 +1,23 @@
 <?php
 namespace Model;
 
+use MySQLi;
+
 class Model
 {
-  protected $db;
+  private static $db;
 
-  function __construct($db)
+  function __construct()
   {
-    $this->db = $db;
+    if (!isset(self::$db)) {
+      $config = include __DIR__ . "/../config.php";
+
+      self::$db = new mysqli($config['hostname'], $config['username'], $config['password'], $config['database']);
+    }
+
+    if (self::$db === false) {
+      // TODO: handle internal error
+    }
   }
 
   function generateUUIDv4()

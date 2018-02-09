@@ -9,9 +9,9 @@ class UsersController extends Controller
 
   private $user;
 
-  function __construct($db, $request, $request_body)
+  function __construct($request, $request_body)
   {
-    $this->user = new User($db);
+    $this->user = new User();
     parent::__construct($request, $request_body);
   }
 
