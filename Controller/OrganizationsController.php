@@ -2,7 +2,8 @@
 namespace Controller;
 
 use Model\Organization;
-use Response;
+use Response\SuccessResponse;
+use Response\ErrorResponse;
 
 class OrganizationsController extends Controller
 {
@@ -26,21 +27,18 @@ class OrganizationsController extends Controller
 
       if ($json === null) {
         ErrorResponse::invalidResource();
-        return;
       }
 
       if ($json === false) {
-        Response::response500();
-        return;
+        ErrorResponse::serverError();
       }
     } else {
       //TODO: return 404 error code if there are no elements
       if (!($json = $this->organization->getOrganizations())) {
-        Response::response500();
-        return;
+        ErrorResponse::serverError();
       }
     }
-    Response::response200($json);
+    SuccessResponse::ok($json);
   }
 
   function post()
@@ -53,22 +51,20 @@ class OrganizationsController extends Controller
     $name = $this->request_body->name;
 
     if (!($id = $this->organization->createOrganization($name))) {
-      Response::response500();
-      return;
+      ErrorResponse::serverError();
     }
     if (!($json = $this->organization->getOrganizationById($id))) {
-      Response::response500();
-      return;
+      ErrorResponse::serverError();
     }
     $location = "\/organizations/" . $this->organization->hex2uuid($id); // The first slash has to be escaped, else it will be read as a regex.
-    Response::response201($json, $location);
+    SuccessResponse::created($json, $location);
   }
 
   function delete()
   {
     if ($this->hasId()) {
       if ($this->organization->deleteOrganization($this->getId())) {
-        Response::response204();
+        SuccessResponse::deleted();
       } else {
         // TODO: internal error
       }

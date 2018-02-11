@@ -2,7 +2,7 @@
 namespace Controller;
 
 use Model\User;
-use Response;
+use Response\SuccessResponse;
 use Response\ErrorResponse;
 
 class UsersController extends Controller
@@ -28,20 +28,17 @@ class UsersController extends Controller
 
       if ($json === null) {
         ErrorResponse::invalidResource();
-        return;
       }
 
       if ($json === false) {
-        Response::response500();
-        return;
+        ErrorResponse::serverError();
       }
     } else {
       //TODO: return 404 error code if there are no elements
       if (!($json = $this->user->getUsers())) {
-        Response::response500();
-        return;
+        ErrorResponse::serverError();
       }
-      Response::response200($json);
+      SuccessResponse::ok($json);
     }
   }
 
@@ -74,23 +71,21 @@ class UsersController extends Controller
     //TODO: Check that we don't create another user that already exist
 
     if (!($id = $this->user->createUser($name, $email, $password, $birthdate))) {
-      Response::response500();
-      return;
+      ErrorResponse::serverError();
     }
 
     if (!($json = $this->user->getUserById($id))) {
-      Response::response500();
-      return;
+      ErrorResponse::serverError();
     }
     $location = "\/users/" . $this->user->hex2uuid($id); // The first slash has to be escaped, else it will be read as a regex.
-    Response::response201($json, $location);
+    SuccessResponse::created($json, $location);
   }
 
   function delete()
   {
     if ($this->hasId()) {
       if ($this->user->deleteUser($this->getId())) {
-        Response::response204();
+        SuccessResponse::deleted();
       } else {
         // TODO: internal error
       }

@@ -47,5 +47,16 @@ class ErrorResponse
     echo json_encode($response);
     exit;
   }
+
+  // The server encountered an error
+  public static function serverError()
+  {
+    header("Content-Type: application/json; charset=UTF-8");
+    http_response_code(500);
+
+    $response['error'] = 'server_error';
+    echo json_encode($response);
+    exit;
+  }
 }
 ?>
