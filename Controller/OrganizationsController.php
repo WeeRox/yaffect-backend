@@ -45,22 +45,23 @@ class OrganizationsController extends Controller
 
   function post()
   {
-    $name = $this->getJsonValue("name");
-
-    if ($name === null) {
+    // check if request body contains name parameter
+    if (!property_exists($this->request_body, "name")) {
       ErrorResponse::invalidRequest();
-    } else {
-      if (!($id = $this->organization->createOrganization($name))) {
-        Response::response500();
-        return;
-      }
-      if (!($json = $this->organization->getOrganizationById($id))) {
-        Response::response500();
-        return;
-      }
-      $location = "\/organizations/" . $this->organization->hex2uuid($id); // The first slash has to be escaped, else it will be read as a regex.
-      Response::response201($json, $location);
     }
+
+    $name = $this->request_body->name;
+
+    if (!($id = $this->organization->createOrganization($name))) {
+      Response::response500();
+      return;
+    }
+    if (!($json = $this->organization->getOrganizationById($id))) {
+      Response::response500();
+      return;
+    }
+    $location = "\/organizations/" . $this->organization->hex2uuid($id); // The first slash has to be escaped, else it will be read as a regex.
+    Response::response201($json, $location);
   }
 
   function delete()

@@ -47,37 +47,43 @@ class UsersController extends Controller
 
   function post()
   {
-    $name = $this->getJsonValue('name');
-    $email = $this->getJsonValue('email');
-    $password = $this->getJsonValue('password');
-    $birthdate = $this->getJsonValue('birthdate');
+    if (!property_exists($this->request_body, "name")) {
+      ErrorResponse::invalidRequest();
+    }
+
+    if (!property_exists($this->request_body, "email")) {
+      ErrorResponse::invalidRequest();
+    }
+
+    if (!property_exists($this->request_body, "password")) {
+      ErrorResponse::invalidRequest();
+    }
+
+    if (!property_exists($this->request_body, "birthdate")) {
+      ErrorResponse::invalidRequest();
+    }
+
+    $name = $this->request_body->name;
+    $email = $this->request_body->email;
+    $password = $this->request_body->password;
+    $birthdate = $this->request_body->birthdate;
 
     //Use bcrypt to hash the password
     $password = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 
     //TODO: Check that we don't create another user that already exist
 
-    if ($name === null) {
-      ErrorResponse::invalidRequest();
-    } else if ($email === null) {
-      ErrorResponse::invalidRequest();
-    } else if ($password === null) {
-      ErrorResponse::invalidRequest();
-    } else if ($birthdate === null) {
-      ErrorResponse::invalidRequest();
-    } else {
-      if (!($id = $this->user->createUser($name, $email, $password, $birthdate))) {
-        Response::response500();
-        return;
-      }
-
-      if (!($json = $this->user->getUserById($id))) {
-        Response::response500();
-        return;
-      }
-      $location = "\/users/" . $this->user->hex2uuid($id); // The first slash has to be escaped, else it will be read as a regex.
-      Response::response201($json, $location);
+    if (!($id = $this->user->createUser($name, $email, $password, $birthdate))) {
+      Response::response500();
+      return;
     }
+
+    if (!($json = $this->user->getUserById($id))) {
+      Response::response500();
+      return;
+    }
+    $location = "\/users/" . $this->user->hex2uuid($id); // The first slash has to be escaped, else it will be read as a regex.
+    Response::response201($json, $location);
   }
 
   function delete()

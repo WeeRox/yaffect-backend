@@ -9,7 +9,7 @@ class Controller
   function __construct($request, $request_body)
   {
     $this->request = $request;
-    $this->request_body = $request_body;
+    $this->request_body = json_decode($request_body);
   }
 
   function hasId()
@@ -24,20 +24,6 @@ class Controller
 
   function getId() {
     return $this->request[0];
-  }
-
-  function getJsonValue($name)
-  {
-    $object = $this->request_body;
-    foreach (explode("->", $name) as $key => $value) {
-      if (isset($object->$value)) {
-        $object = $object->$value;
-      } else {
-        return null;
-      }
-    }
-
-    return $object;
   }
 }
 ?>
