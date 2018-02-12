@@ -2,7 +2,8 @@
 namespace Controller;
 
 use Model\Organization;
-use Response;
+use Response\SuccessResponse;
+use Response\ErrorResponse;
 
 class OrganizationsController extends Controller
 {
@@ -21,61 +22,54 @@ class OrganizationsController extends Controller
 
   function get()
   {
-    $id = $this->checkForId();
-    if ($id != null) {
-      $json = $this->organization->getOrganizationById($id);
+    if ($this->hasId()) {
+      $json = $this->organization->getOrganizationById($this->getId());
+
       if ($json === null) {
         ErrorResponse::invalidResource();
-        return;
       }
 
       if ($json === false) {
-        Response::response500();
-        return;
+        ErrorResponse::serverError();
       }
     } else {
       //TODO: return 404 error code if there are no elements
       if (!($json = $this->organization->getOrganizations())) {
-        Response::response500();
-        return;
+        ErrorResponse::serverError();
       }
     }
-    Response::response200($json);
+    SuccessResponse::ok($json);
   }
 
   function post()
   {
-    $name = $this->getJsonValue("name");
-
-    if ($name === null) {
+    // check if request body contains name parameter
+    if (!property_exists($this->request_body, "name")) {
       ErrorResponse::invalidRequest();
-    } else {
-      if (!($id = $this->organization->createOrganization($name))) {
-        Response::response500();
-        return;
-      }
-      if (!($json = $this->organization->getOrganizationById($id))) {
-        Response::response500();
-        return;
-      }
-      $location = "\/organizations/" . $this->organization->hex2uuid($id); // The first slash has to be escaped, else it will be read as a regex.
-      Response::response201($json, $location);
     }
+
+    $name = $this->request_body->name;
+
+    if (!($id = $this->organization->createOrganization($name))) {
+      ErrorResponse::serverError();
+    }
+    if (!($json = $this->organization->getOrganizationById($id))) {
+      ErrorResponse::serverError();
+    }
+    $location = "\/organizations/" . $this->organization->hex2uuid($id); // The first slash has to be escaped, else it will be read as a regex.
+    SuccessResponse::created($json, $location);
   }
 
   function delete()
   {
-    $id = $this->checkForId();
-    if ($id != null) {
-      $response = $this->organization->deleteOrganization($id);
-      if ($response) {
-        Response::response204();
-        return;
+    if ($this->hasId()) {
+      if ($this->organization->deleteOrganization($this->getId())) {
+        SuccessResponse::deleted();
       } else {
-        Reponse::response500();
-        return;
+        // TODO: internal error
       }
     } else {
+      // if no id was sent a delete operation cannot be performed
       ErrorResponse::invalidMethod(array("GET"));
     }
   }

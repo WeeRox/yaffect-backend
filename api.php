@@ -1,10 +1,16 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 'On');
+$config = include 'config.php';
+
+if ($config['debug']) {
+  error_reporting(E_ALL);
+  ini_set('display_errors', 'On');
+} else {
+  error_reporting(0);
+  ini_set('display_errors', 'Off');
+}
 
 use Controller\UsersController;
 use Controller\OrganizationsController;
-use Response;
 use Response\ErrorResponse;
 
 // Register an autoloader for classes.
@@ -35,7 +41,6 @@ switch (array_shift($request)) {
 
   default:
     ErrorResponse::invalidResource();
-    exit;
     break;
 }
 

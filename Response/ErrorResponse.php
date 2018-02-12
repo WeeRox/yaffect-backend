@@ -3,17 +3,10 @@ namespace Response;
 
 class ErrorResponse
 {
-  private $response = array();
-
-  private static function init()
-  {
-    header("Content-Type: application/json; charset=UTF-8");
-  }
-
   // The request used a request method that isn't allowed
   public static function invalidMethod($allowed_methods)
   {
-    self::init();
+    header("Content-Type: application/json; charset=UTF-8");
     http_response_code(405);
 
     $allow = "Allow: ";
@@ -30,26 +23,40 @@ class ErrorResponse
 
     $response['error'] = 'invalid_method';
     echo json_encode($response);
+    exit;
   }
 
   // The resource wasn't found/doesn't exist
   public static function invalidResource()
   {
-    self::init();
+    header("Content-Type: application/json; charset=UTF-8");
     http_response_code(404);
 
     $response['error'] = "invalid_resource";
     echo json_encode($response);
+    exit;
   }
 
   // The request was invalid
   public static function invalidRequest()
   {
-    self::init();
+    header("Content-Type: application/json; charset=UTF-8");
     http_response_code(400);
 
     $response['error'] = 'invalid_request';
     echo json_encode($response);
+    exit;
+  }
+
+  // The server encountered an error
+  public static function serverError()
+  {
+    header("Content-Type: application/json; charset=UTF-8");
+    http_response_code(500);
+
+    $response['error'] = 'server_error';
+    echo json_encode($response);
+    exit;
   }
 }
 ?>

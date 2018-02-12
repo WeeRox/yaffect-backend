@@ -2,7 +2,8 @@
 namespace Controller;
 
 use Model\User;
-use Response;
+use Response\SuccessResponse;
+use Response\ErrorResponse;
 
 class UsersController extends Controller
 {
@@ -22,76 +23,74 @@ class UsersController extends Controller
 
   function get()
   {
-    $id = $this->checkForId();
-    if ($id != null) {
-      $json = $this->user->getUserById($id);
+    if ($this->hasId()) {
+      $json = $this->user->getUserById($this->getId());
+
       if ($json === null) {
         ErrorResponse::invalidResource();
-        return;
       }
 
       if ($json === false) {
-        Response::response500();
-        return;
+        ErrorResponse::serverError();
       }
     } else {
       //TODO: return 404 error code if there are no elements
       if (!($json = $this->user->getUsers())) {
-        Response::response500();
-        return;
+        ErrorResponse::serverError();
       }
-      Response::response200($json);
+      SuccessResponse::ok($json);
     }
   }
 
   function post()
   {
-    $name = $this->getJsonValue('name');
-    $email = $this->getJsonValue('email');
-    $password = $this->getJsonValue('password');
-    $birthdate = $this->getJsonValue('birthdate');
+    if (!property_exists($this->request_body, "name")) {
+      ErrorResponse::invalidRequest();
+    }
+
+    if (!property_exists($this->request_body, "email")) {
+      ErrorResponse::invalidRequest();
+    }
+
+    if (!property_exists($this->request_body, "password")) {
+      ErrorResponse::invalidRequest();
+    }
+
+    if (!property_exists($this->request_body, "birthdate")) {
+      ErrorResponse::invalidRequest();
+    }
+
+    $name = $this->request_body->name;
+    $email = $this->request_body->email;
+    $password = $this->request_body->password;
+    $birthdate = $this->request_body->birthdate;
 
     //Use bcrypt to hash the password
     $password = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 
     //TODO: Check that we don't create another user that already exist
 
-    if ($name === null) {
-      ErrorResponse::invalidRequest();
-    } else if ($email === null) {
-      ErrorResponse::invalidRequest();
-    } else if ($password === null) {
-      ErrorResponse::invalidRequest();
-    } else if ($birthdate === null) {
-      ErrorResponse::invalidRequest();
-    } else {
-      if (!($id = $this->user->createUser($name, $email, $password, $birthdate))) {
-        Response::response500();
-        return;
-      }
-
-      if (!($json = $this->user->getUserById($id))) {
-        Response::response500();
-        return;
-      }
-      $location = "\/users/" . $this->user->hex2uuid($id); // The first slash has to be escaped, else it will be read as a regex.
-      Response::response201($json, $location);
+    if (!($id = $this->user->createUser($name, $email, $password, $birthdate))) {
+      ErrorResponse::serverError();
     }
+
+    if (!($json = $this->user->getUserById($id))) {
+      ErrorResponse::serverError();
+    }
+    $location = "\/users/" . $this->user->hex2uuid($id); // The first slash has to be escaped, else it will be read as a regex.
+    SuccessResponse::created($json, $location);
   }
 
   function delete()
   {
-    $id = $this->checkForId();
-    if ($id != null) {
-      $response = $this->user->deleteOrganization($id);
-      if ($response) {
-        Response::response204();
-        return;
+    if ($this->hasId()) {
+      if ($this->user->deleteUser($this->getId())) {
+        SuccessResponse::deleted();
       } else {
-        Response::response500();
-        return;
+        // TODO: internal error
       }
     } else {
+      // if no id was sent a delete operation cannot be performed
       ErrorResponse::invalidMethod(array("GET"));
     }
   }
