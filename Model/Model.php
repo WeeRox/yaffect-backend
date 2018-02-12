@@ -9,7 +9,6 @@ class Model
 
   function __construct()
   {
-    exit();
     if (!isset(self::$db)) {
       $config = include __DIR__ . "/../config.php";
 
@@ -18,13 +17,6 @@ class Model
       if (self::$db->connect_error) {
         // TODO: handle internal error
       }
-    }
-  }
-
-  function __destruct()
-  {
-    if (self::$db !== null) {
-      self::$db->close();
     }
   }
 

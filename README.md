@@ -8,6 +8,9 @@ return array(
   'username' => '[username]',
   'password' => '[password]',
   'database' => '[database-name]',
+  'url_oauth2' => '[url]',
+  'client_id' => '[client_id]',
+  'client_secret' => '[client_secret]',
   'debug' => true
 );
 ?>

@@ -9,10 +9,6 @@ if ($config['debug']) {
   ini_set('display_errors', 'Off');
 }
 
-use Controller\UsersController;
-use Controller\OrganizationsController;
-use Response\ErrorResponse;
-
 // Register an autoloader for classes.
 // The namespace will correspond to folder structure
 spl_autoload_register(function ($class)
@@ -22,6 +18,50 @@ spl_autoload_register(function ($class)
     include $file;
   }
 });
+
+use Controller\UsersController;
+use Controller\OrganizationsController;
+use Response\ErrorResponse;
+
+// No authentication included
+if (empty($_SERVER['HTTP_AUTHORIZATION'])) {
+  ErrorResponse::invalidClient();
+}
+
+$auth = explode(" ", $_SERVER['HTTP_AUTHORIZATION']);
+// The request used an unsupported authentication method
+if ($auth[0] !== "Bearer") {
+  ErrorResponse::invalidClient();
+}
+
+$token = $auth[1];
+
+$ch = curl_init();
+
+curl_setopt($ch, CURLOPT_URL, $config['url_oauth2'] . '/introspect');
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+curl_setopt($ch, CURLOPT_USERPWD, $config['client_id'] . ":" . $config['client_secret']);
+curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array("token" => "$token")));
+
+curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+
+$response = curl_exec($ch);
+
+if (curl_errno($ch)) {
+  // TODO: Handle cURL error
+}
+
+$response_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
+
+if ($response_code != 200) {
+  // TODO: Handle error
+}
+
+//var_dump($response_code);
+//var_dump($response);
 
 // Turn the request path into an array
 $request = explode("/", $_GET['request']);

@@ -48,6 +48,14 @@ class ErrorResponse
     exit;
   }
 
+  // The authentication information was somehow invalid
+  public static function invalidClient()
+  {
+    header("WWW-Authenticate: Bearer");
+    http_response_code(401);
+    exit;
+  }
+
   // The server encountered an error
   public static function serverError()
   {
