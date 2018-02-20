@@ -48,6 +48,16 @@ class ErrorResponse
     exit;
   }
 
+  public static function invalidToken()
+  {
+    header("Content-Type: application/json; charset=UTF-8");
+    http_response_code(401);
+
+    $response['error'] = 'invalid_token';
+    echo json_encode($response);
+    exit;
+  }
+
   // The authentication information was somehow invalid
   public static function invalidClient()
   {
