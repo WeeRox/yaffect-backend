@@ -76,6 +76,18 @@ if ($request_body === NULL) {
   $request_body = json_decode("{}");
 }
 
+// Define all endpoints
+$endpoints = array(
+  "/^users$/" => array(
+    "GET" => function() {
+      // TODO: Return all users
+    },
+    "POST" => function() {
+      // TODO: Create a user
+    }
+  )
+);
+
 switch (array_shift($request)) {
   case 'users':
     $controller = new UsersController($request, $request_body);
