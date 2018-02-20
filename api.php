@@ -72,7 +72,7 @@ $request = explode("/", $_GET['request']);
 
 $request_body = json_decode(file_get_contents("php://input"));
 
-$method = $_SERVER['REQUEST_METHOD'];
+$request_method = $_SERVER['REQUEST_METHOD'];
 
 switch (array_shift($request)) {
   case 'users':
@@ -88,8 +88,8 @@ switch (array_shift($request)) {
     break;
 }
 
-if (method_exists($controller, $method)) {
-  $controller->$method();
+if (method_exists($controller, $request_method)) {
+  $controller->$request_method();
 } else {
   ErrorResponse::invalidMethod($controller->get_methods());
 }
