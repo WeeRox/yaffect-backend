@@ -60,8 +60,12 @@ if ($response_code != 200) {
   // TODO: Handle error
 }
 
-//var_dump($response_code);
-//var_dump($response);
+$response = json_decode($response);
+
+// The token isn't active
+if ($response->active === false) {
+  ErrorResponse::invalidToken();
+}
 
 // Turn the request path into an array
 $request = explode("/", $_GET['request']);
