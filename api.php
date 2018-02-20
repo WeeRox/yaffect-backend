@@ -72,6 +72,10 @@ $request = explode("/", $_GET['request']);
 
 $request_body = json_decode(file_get_contents("php://input"));
 
+if ($request_body === NULL) {
+  $request_body = json_decode("{}");
+}
+
 $request_method = $_SERVER['REQUEST_METHOD'];
 
 switch (array_shift($request)) {

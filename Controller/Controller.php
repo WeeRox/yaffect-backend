@@ -9,7 +9,7 @@ class Controller
   function __construct($request, $request_body)
   {
     $this->request = $request;
-    $this->request_body = json_decode($request_body);
+    $this->request_body = $request_body;
   }
 
   function hasId()
