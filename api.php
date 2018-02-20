@@ -67,16 +67,14 @@ if ($response->active === false) {
   ErrorResponse::invalidToken();
 }
 
-// Turn the request path into an array
-$request = explode("/", $_GET['request']);
-
+// The .htaccess have removed eventual first and last slash
+$request = $_GET['request'];
+$request_method = $_SERVER['REQUEST_METHOD'];
 $request_body = json_decode(file_get_contents("php://input"));
 
 if ($request_body === NULL) {
   $request_body = json_decode("{}");
 }
-
-$request_method = $_SERVER['REQUEST_METHOD'];
 
 switch (array_shift($request)) {
   case 'users':
