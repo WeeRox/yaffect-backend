@@ -9,17 +9,7 @@ class ErrorResponse
     header("Content-Type: application/json; charset=UTF-8");
     http_response_code(405);
 
-    $allow = "Allow: ";
-
-    for ($i = 0; $i < count($allowed_methods); $i++) {
-      if ($i != 0) {
-        $allow .= ", ";
-      }
-
-      $allow .= $allowed_methods[$i];
-    }
-
-    header($allow);
+    header("Allow: " . implode(", ", $allowed_methods));
 
     $response['error'] = 'invalid_method';
     echo json_encode($response);
