@@ -82,15 +82,18 @@ $endpoints = array(
     "GET" => function() {
       // TODO: Return all users
     },
-    "POST" => function() {
-      // TODO: Create a user
+    "POST" => function() use ($request_body) {
+      // TODO: Do input validation
+      $user = new User();
+      $user->create($request_body->name, $request_body->birthdate);
+      SuccessResponse::created(json_encode($user), "/users/" . $user->getId());
     }
   ),
   "/^users\/([A-Za-z0-9_-]+)$/" => array(
     "GET" => function($match) {
       $user = new User();
       $user->getById($match[0]);
-      SuccessResponse::created(json_encode($user), '/users/' . $user->getId());
+      SuccessResponse::ok(json_encode($user));
     }
   )
 );

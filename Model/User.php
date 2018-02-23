@@ -28,6 +28,18 @@ class User extends Model implements JsonSerializable
     }
   }
 
+  public function create($name, $birthdate)
+  {
+    $id = $this->uuid2hex($this->generateUUIDv4());
+    if (parent::$db->query("INSERT INTO users VALUES (UNHEX('$id'), '$name', '$birthdate');")) {
+      $this->id = $this->hex2base64url($id);
+      $this->name = $name;
+      $this->birthdate = $birthdate;
+    } else {
+      // TODO: Database error
+    }
+  }
+
   public function getId()
   {
     return $this->id;
