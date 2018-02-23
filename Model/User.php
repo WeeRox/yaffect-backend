@@ -23,6 +23,8 @@ class User extends Model implements JsonSerializable
       $this->id = $this->hex2base64url($id);
       $this->name = $row['name'];
       $this->birthdate = $row['birthdate'];
+
+      $result->close();
     } else {
       // TODO: Database error
     }
@@ -40,9 +42,42 @@ class User extends Model implements JsonSerializable
     }
   }
 
+  public function getAll()
+  {
+    if ($result = parent::$db->query("SELECT * FROM users;")) {
+      $users = array();
+      while ($row = $result->fetch_assoc()) {
+        $user = new User();
+        $user->setId($this->hex2base64url(bin2hex($row["user_id"])));
+        $user->setName($row["name"]);
+        $user->setBirthdate($row["birthdate"]);
+        $users[] = $user;
+      }
+
+      $result->close();
+      return $users;
+    } else {
+      // TODO: Database error
+    }
+  }
+
   public function getId()
   {
     return $this->id;
+  }
+
+  private function setId($id)
+  {
+    $this->id = $id;
+  }
+
+  private function setName($name)
+  {
+    $this->name = $name;
+  }
+
+  private function setBirthdate($birthdate) {
+    $this->birthdate = $birthdate;
   }
 
   public function jsonSerialize()

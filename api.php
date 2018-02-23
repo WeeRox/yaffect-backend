@@ -80,7 +80,9 @@ if ($request_body === NULL) {
 $endpoints = array(
   "/^users$/" => array(
     "GET" => function() {
-      // TODO: Return all users
+      $users = new User();
+      $users = $users->getAll();
+      SuccessResponse::ok(json_encode($users));
     },
     "POST" => function() use ($request_body) {
       // TODO: Do input validation
