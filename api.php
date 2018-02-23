@@ -19,9 +19,9 @@ spl_autoload_register(function ($class)
   }
 });
 
-use Controller\UsersController;
-use Controller\OrganizationsController;
 use Response\ErrorResponse;
+use Response\SuccessResponse;
+use Model\User;
 
 // No authentication included
 if (empty($_SERVER['HTTP_AUTHORIZATION'])) {
@@ -85,26 +85,34 @@ $endpoints = array(
     "POST" => function() {
       // TODO: Create a user
     }
+  ),
+  "/^users\/([A-Za-z0-9_-]+)$/" => array(
+    "GET" => function($match) {
+      $user = new User();
+      $user->getById($match[0]);
+      SuccessResponse::created(json_encode($user), '/users/' . $user->getId());
+    }
   )
 );
 
-switch (array_shift($request)) {
-  case 'users':
-    $controller = new UsersController($request, $request_body);
+$matched_endpoint = false;
+foreach ($endpoints as $key => $value) {
+  if (preg_match($key, $request, $match)) {
+    $matched_endpoint = $value;
     break;
-
-  case 'organizations':
-    $controller = new OrganizationsController($request, $request_body);
-    break;
-
-  default:
-    ErrorResponse::invalidResource();
-    break;
+  }
 }
 
-if (method_exists($controller, $request_method)) {
-  $controller->$request_method();
+if ($matched_endpoint !== false) {
+  if (array_key_exists($request_method, $matched_endpoint)) {
+    // Remove 'full match' element
+    array_shift($match);
+    $matched_endpoint[$request_method]($match);
+  } else {
+    ErrorResponse::invalidMethod(array_keys($matched_endpoint));
+  }
 } else {
-  ErrorResponse::invalidMethod($controller->get_methods());
+  // No endpoint matching the request exists
+  // TODO: Handle error
 }
 ?>

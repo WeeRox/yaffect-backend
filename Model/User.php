@@ -1,61 +1,45 @@
 <?php
 namespace Model;
 
-class User extends Model
-{
-  function createUser($name, $email, $password, $birthdate)
-  {
-    $id = $this->generateUUIDv4();
-    if ($this->db->query("INSERT INTO users (id, name, email, password, birthdate) VALUES (UNHEX('$id'), '$name', '$email', '$password', '$birthdate');")) {
-      return $this->hex2uuid($id);
-    }
-    return false;
-  }
+use JsonSerializable;
 
-  function getUserById($id)
+class User extends Model implements JsonSerializable
+{
+  private $id;
+  private $name;
+  private $birthdate;
+
+  public function getById($id)
   {
-    $id = $this->uuid2hex($id);
-    if ($result = $this->db->query("SELECT *, HEX(id) AS id FROM users WHERE id = UNHEX('$id');")) {
-      if ($result->num_rows < 1) {
-        return null;
+    $id = $this->base64url2hex($id);
+    if ($result = parent::$db->query("SELECT * FROM users WHERE user_id = UNHEX('$id');")) {
+      // Check that a user with that id exists
+      if ($result->num_rows != 1) {
+        // TODO: Handle error
       }
 
       $row = $result->fetch_assoc();
-      $json = array(
-        'id' => $this->hex2uuid($row['id']),
-        'name' => $row['name'],
-        'email' => $row['email'],
-        'birthdate' => $row['birthdate']
-      );
 
-      $result->close();
-      return json_encode($json);
+      $this->id = $this->hex2base64url($id);
+      $this->name = $row['name'];
+      $this->birthdate = $row['birthdate'];
+    } else {
+      // TODO: Database error
     }
-    return false;
   }
 
-  function getUsers()
+  public function getId()
   {
-    if ($result = $this->db->query("SELECT *, HEX(id) AS id FROM users;")) {
-      $rows = array();
-      while ($row = $result->fetch_assoc()) {
-        $row['id'] = $this->hex2uuid($row['id']);
-        $rows[] = $row;
-      }
-
-      $result->close();
-      return json_encode($rows);
-    }
-    return false;
+    return $this->id;
   }
 
-  function deleteOrganization($id)
+  public function jsonSerialize()
   {
-    $id = $this->uuid2hex($id);
-    if ($this->db->query("DELETE FROM users WHERE id = UNHEX('$id');")) {
-      return true;
-    }
-    return false;
+    return array(
+      "id" => $this->id,
+      "name" => $this->name,
+      "birthdate" => $this->birthdate
+    );
   }
 }
 ?>

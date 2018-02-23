@@ -5,7 +5,7 @@ use MySQLi;
 
 class Model
 {
-  private static $db;
+  protected static $db;
 
   function __construct()
   {
