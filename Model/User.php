@@ -8,6 +8,7 @@ class User extends Model implements JsonSerializable
 	private $id;
 	private $name;
 	private $birthdate;
+	private $organization_id = null;
 
 	public function getById($id)
 	{
@@ -76,8 +77,40 @@ class User extends Model implements JsonSerializable
 		$this->name = $name;
 	}
 
-	private function setBirthdate($birthdate) {
+	private function setBirthdate($birthdate)
+	{
 		$this->birthdate = $birthdate;
+	}
+
+	public function isAdmin()
+	{
+		$user_id = $this->base64url2hex($this->id);
+		if ($result = parent::$db->query("SELECT * FROM organization_users WHERE user_id = UNHEX('$user_id');")) {
+			if ($result->num_rows === 0) {
+				return false;
+			} else {
+				$row = $result->fetch_assoc();
+				$this->organization_id = $this->hex2base64url(bin2hex($row['organization_id']));
+				return true;
+			}
+		} else {
+			// TODO: Database error
+		}
+	}
+
+	public function getOrganizationId()
+	{
+		// If isAdmin hasn't been called for some reason
+		if ($this->organization_id === null) {
+			$user_id = $this->base64url2hex($this->id);
+			if ($result = parent::$db->query("SELECT * FROM organization_users WHERE user_id = '$user_id';")) {
+				$row = $result->fetch_assoc();
+				$this->organization_id = $this->hex2base64url(bin2hex($row['organization_id']));
+			} else {
+				// TODO: Database error
+			}
+		}
+		return $this->organization_id;
 	}
 
 	public function jsonSerialize()
