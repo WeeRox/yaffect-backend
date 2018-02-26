@@ -4,8 +4,8 @@ namespace Model;
 class Post extends Model
 {
 	protected $post_id;
-	protected $organization_id;
-	protected $question;
+	protected $post_type;
+	protected $created;
 
 	public function getId()
 	{

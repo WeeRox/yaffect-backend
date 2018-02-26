@@ -5,6 +5,12 @@ use JsonSerializable;
 
 class YesNoAnswerPost extends AnswerPost implements JsonSerializable
 {
+
+	public function __construct()
+	{
+		$this->answer_type = "yes_no";
+	}
+
 	public function create($question, $organization_id)
 	{
 		$id = $this->uuid2hex($this->generateUUIDv4());
@@ -22,8 +28,8 @@ class YesNoAnswerPost extends AnswerPost implements JsonSerializable
 	{
 		return array(
 			"post_id" => $this->post_id,
-			"post_type" => "answer",
-			"answer_type" => "yes_no",
+			"post_type" => $this->post_type,
+			"answer_type" => $this->answer_type,
 			"question" => $this->question,
 			"organization_id" => $this->organization_id
 		);

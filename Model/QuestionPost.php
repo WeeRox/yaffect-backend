@@ -6,6 +6,13 @@ use JsonSerializable;
 class QuestionPost extends Post implements JsonSerializable
 {
 	private $user_id;
+	private $organization_id;
+	private $question;
+
+	public function __construct()
+	{
+		$this->post_type = "question";
+	}
 
 	public function create($question, $user_id, $organization_id)
 	{
@@ -27,7 +34,7 @@ class QuestionPost extends Post implements JsonSerializable
 	{
 		return array(
 			"post_id" => $this->post_id,
-			"post_type" => "question",
+			"post_type" => $this->post_type,
 			"question" => $this->question,
 			"organization_id" => $this->organization_id,
 			"user_id" => $this->user_id
