@@ -1,12 +1,15 @@
 <?php
 namespace Model;
 
-use JsonSerializable;
-
-class Post extends Model implements JsonSerializable
+class Post extends Model
 {
-	private $post_id;
-	private $organization_id;
-	private $question;
+	protected $post_id;
+	protected $post_type;
+	protected $created;
+
+	public function getId()
+	{
+		return $this->post_id;
+	}
 }
 ?>

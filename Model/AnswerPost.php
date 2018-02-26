@@ -1,9 +1,16 @@
 <?php
 namespace Model;
 
-use JsonSerializable;
-
-class AnswerPost extends Post implements JsonSerializable
+class AnswerPost extends Post
 {
+	protected $organization_id;
+	protected $answer_type;
+	protected $question;
+
+	public function __construct()
+	{
+		parent::__construct();
+		$this->post_type = "answer";
+	}
 }
 ?>

@@ -3,11 +3,17 @@ namespace Model;
 
 use JsonSerializable;
 
-class MultichoiceAnserPost extends AnswerPost implements JsonSerializable
+class MultichoiceAnswerPost extends AnswerPost implements JsonSerializable
 {
+	public function __construct()
+	{
+		parent::__construct();
+		$this->answer_type = "multichoice";
+	}
+
 	public function create($question, $alternatives)
 	{
-		
+
 	}
 }
 ?>

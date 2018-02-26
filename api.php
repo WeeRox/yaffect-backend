@@ -22,6 +22,8 @@ spl_autoload_register(function ($class)
 use Response\ErrorResponse;
 use Response\SuccessResponse;
 use Model\User;
+use Model\YesNoAnswerPost;
+use Model\QuestionPost;
 
 // No authentication included
 if (empty($_SERVER['HTTP_AUTHORIZATION'])) {
@@ -99,9 +101,33 @@ $endpoints = array(
 		}
 	),
 	"/^posts$/" => array(
-		"POST" => function() use ($request_body) {
-			$post = new Post();
-			$post->create();
+		"POST" => function() use ($request_body, $response) {
+			if ($request_body->post_type === "answer") {
+				// TODO: Check that the user is an admin
+				$user = new User();
+				$user->getById($response->user_id);
+				if ($user->isAdmin()) {
+					if ($request_body->answer_type === "yes_no") {
+						$post = new YesNoAnswerPost();
+						$post->create($request_body->question, $user->getOrganizationId());
+					} else if ($request_body->answer_type === "multichoice") {
+						$post = new MultichoiceAnswerPost();
+						$post->create($request_body->question, "alternatives");
+					} else if ($request_body->answer_type === "singlechoice") {
+						$post = new SinglechoiceAnswerPost();
+						$post->create($request_body->question, "alternatives");
+					} else {
+						// TODO: Value not supported
+					}
+				} else {
+					// TODO: The user can't perform this opperation
+				}
+			} else if ($request_body->post_type === "question") {
+				$post = new QuestionPost();
+				$post->create($request_body->question, $response->user_id, $request_body->organization_id);
+			} else {
+				// TODO: Value not supported
+			}
 			SuccessResponse::created(json_encode($post), "/posts/" . $post->getId());
 		}
 	)
