@@ -11,6 +11,7 @@ class QuestionPost extends Post implements JsonSerializable
 
 	public function __construct()
 	{
+		parent::__construct();
 		$this->post_type = "question";
 	}
 
@@ -20,6 +21,7 @@ class QuestionPost extends Post implements JsonSerializable
 		$user_id = $this->base64url2hex($user_id);
 		$organization_id = $this->base64url2hex($organization_id);
 		if (parent::$db->multi_query("INSERT INTO posts VALUES (UNHEX('$id'), 'question', UTC_TIMESTAMP()); INSERT INTO question_posts (post_id, user_id, organization_id, question) VALUES (UNHEX('$id'), UNHEX('$user_id'), UNHEX('$organization_id'), '$question');")) {
+			while (parent::$db->more_results()) {parent::$db->next_result();} // Flush the queries
 			// Get the correct UTC_TIMESTAMP() value which was generated in the previous query
 			if ($result = parent::$db->query("SELECT created FROM posts WHERE post_id = UNHEX('$id');")) {
 				$row = $result->fetch_assoc();

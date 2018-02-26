@@ -7,6 +7,7 @@ class YesNoAnswerPost extends AnswerPost implements JsonSerializable
 {
 	public function __construct()
 	{
+		parent::__construct();
 		$this->answer_type = "yes_no";
 	}
 

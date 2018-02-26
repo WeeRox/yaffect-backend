@@ -7,6 +7,7 @@ class MultichoiceAnswerPost extends AnswerPost implements JsonSerializable
 {
 	public function __construct()
 	{
+		parent::__construct();
 		$this->answer_type = "multichoice";
 	}
 

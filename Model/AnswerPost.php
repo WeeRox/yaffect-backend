@@ -9,6 +9,7 @@ class AnswerPost extends Post
 
 	public function __construct()
 	{
+		parent::__construct();
 		$this->post_type = "answer";
 	}
 }

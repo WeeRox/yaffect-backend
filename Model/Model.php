@@ -14,7 +14,7 @@ class Model
 
 			self::$db = new mysqli($config['hostname'], $config['username'], $config['password'], $config['database']);
 
-			if (self::$db->connect_error) {
+			if (self::$db->connect_errno) {
 				// TODO: handle internal error
 			}
 		}
