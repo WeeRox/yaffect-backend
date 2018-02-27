@@ -23,6 +23,7 @@ use Response\ErrorResponse;
 use Response\SuccessResponse;
 use Model\User;
 use Model\YesNoAnswerPost;
+use Model\MultichoiceAnswerPost;
 use Model\QuestionPost;
 
 // No authentication included
@@ -112,7 +113,7 @@ $endpoints = array(
 						$post->create($request_body->question, $user->getOrganizationId());
 					} else if ($request_body->answer_type === "multichoice") {
 						$post = new MultichoiceAnswerPost();
-						$post->create($request_body->question, "alternatives");
+						$post->create($request_body->question, $user->getOrganizationId(), $request_body->alternatives);
 					} else if ($request_body->answer_type === "singlechoice") {
 						$post = new SinglechoiceAnswerPost();
 						$post->create($request_body->question, "alternatives");
