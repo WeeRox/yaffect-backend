@@ -26,6 +26,7 @@ use Model\YesNoAnswerPost;
 use Model\MultichoiceAnswerPost;
 use Model\SinglechoiceAnswerPost;
 use Model\QuestionPost;
+use Model\Follow;
 
 // No authentication included
 if (empty($_SERVER['HTTP_AUTHORIZATION'])) {
@@ -82,6 +83,18 @@ if ($request_body === NULL) {
 
 // Define all endpoints
 $endpoints = array(
+	// It is important that this endpoint is before /users/{id}, to gain priority
+	"/^users\/follows$/" => array(
+		"GET" => function() use ($response) {
+			$follow = new Follow();
+			SuccessResponse::ok(json_encode($follow->getAll($response->user_id)));
+		},
+		"POST" => function() use ($request_body, $response) {
+			$follow = new Follow();
+			$follow->create($response->user_id, $request_body->organization_id);
+			SuccessResponse::created(null, "/users/follows");
+		}
+	),
 	"/^users$/" => array(
 		"GET" => function() {
 			$users = new User();
@@ -105,7 +118,6 @@ $endpoints = array(
 	"/^posts$/" => array(
 		"POST" => function() use ($request_body, $response) {
 			if ($request_body->post_type === "answer") {
-				// TODO: Check that the user is an admin
 				$user = new User();
 				$user->getById($response->user_id);
 				if ($user->isAdmin()) {
